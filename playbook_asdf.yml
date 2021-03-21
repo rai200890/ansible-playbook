@@ -1,0 +1,116 @@
+---
+- name: Setup asdf
+  remote_user: root
+  hosts: localhost
+  vars_prompt:
+    - name: username
+      prompt: What is your username?
+      private: no
+
+  tasks:
+  - name: Install asdf deps
+    apt:
+      name: [git, curl, automake, autoconf, libreadline-dev, libncurses-dev, libssl-dev, libyaml-dev, libxslt-dev, libffi-dev, libtool, unixodbc-dev, xsltproc, fop, libxml2-utils]
+      state: latest
+      update_cache: true
+
+  - name: Remove asdf
+    become: yes
+    become_method: su
+    become_user: '{{username}}'
+    shell: rm -rf ~/.asdf
+
+  - name: Install asdf
+    become: yes
+    become_method: su
+    become_user: '{{username}}'
+    shell: git clone https://github.com/asdf-vm/asdf.git ~/.asdf
+
+  - name: Install plugin python
+    become: yes
+    become_method: su
+    become_user: '{{username}}'
+    shell: 
+      cmd: . ~/.zshrc && asdf plugin-add python
+    args:
+      executable: /usr/bin/zsh
+
+  - name: Install plugin nodejs
+    become: yes
+    become_method: su
+    become_user: '{{username}}'
+    shell: 
+      cmd: . ~/.zshrc && asdf plugin-add nodejs
+    args:
+      executable: /usr/bin/zsh
+
+  - name: Install plugin kubectx
+    become: yes
+    become_method: su
+    become_user: '{{username}}'
+    shell: 
+      cmd: . ~/.zshrc && asdf plugin-add kubectx
+    args:
+      executable: /usr/bin/zsh
+
+  - name: Install plugin kubectl
+    become: yes
+    become_method: su
+    become_user: '{{username}}'
+    shell: 
+      cmd: . ~/.zshrc && asdf plugin-add kubectl
+    args:
+      executable: /usr/bin/zsh
+
+  - name: Install plugin erlang
+    become: yes
+    become_method: su
+    become_user: '{{username}}'
+    shell: 
+      cmd: . ~/.zshrc && asdf plugin-add erlang
+    args:
+      executable: /usr/bin/zsh
+
+  - name: Install plugin elixir
+    become: yes
+    become_method: su
+    become_user: '{{username}}'
+    shell: 
+      cmd: . ~/.zshrc && asdf plugin-add elixir
+    args:
+      executable: /usr/bin/zsh
+  
+  - name: Install python
+    become: yes
+    become_method: su
+    become_user: '{{username}}'
+    shell: 
+      cmd: . ~/.zshrc && asdf install python latest 
+    args:
+      executable: /usr/bin/zsh
+
+  - name: Install pip
+    become: yes
+    become_method: su
+    become_user: '{{username}}'
+    shell: 
+      cmd: . ~/.zshrc && asdf global python latest && pip -U install pip pipenv ipython && asdf reshim python 
+    args:
+      executable: /usr/bin/zsh
+  
+  - name: Install nodejs
+    become: yes
+    become_method: su
+    become_user: '{{username}}'
+    shell: 
+      cmd: . ~/.zshrc && asdf global nodejs latest
+    args:
+      executable: /usr/bin/zsh
+  
+  # - name: Install elixir latest
+  #   become: yes
+  #   become_method: su
+  #   become_user: '{{username}}'
+  #   shell: '/home/{{username}}/.asdf/bin/asdf install elixir latest'
+  #   args:
+  #     executable: sh

@@ -1,49 +1,13 @@
 ---
-- name: Setup machine
+- name: Setup Docker
   remote_user: root
   hosts: localhost
   tasks:
 
-  - name: Install vim
-    apt:
-      name: vim
-      state: latest
-
-  - name: Install git
-    apt:
-      name: git
-      state: latest
-
-  - name: Install tig
-    apt:
-      name: tig
-      state: latest
-
-  - name: Install zsh
-    apt:
-      name: zsh
-      state: latest
-  
   - name: Install docker deps
     apt:
       name: [apt-transport-https, ca-certificates, curl, gnupg, lsb-release]
       state: latest
-
-  - name: Install chromium
-    snap:
-      name: chromium    
-
-  - name: Install VsCode
-    snap:
-      name: code
-
-  - name: Install dbeaver
-    snap:
-      name: dbeaver-ce
-
-  - name: Install Postman
-    snap:
-      name: postman
 
   - name: Remove docker key
     shell: rm -rf /usr/share/keyrings/docker-archive-keyring.gpg 

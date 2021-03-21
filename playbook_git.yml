@@ -1,0 +1,72 @@
+---
+- name: Setup git with SSH
+  hosts: localhost
+  remote_user: root
+  vars_prompt:
+    - name: username
+      prompt: What is your username?
+      private: no
+
+    - name: name
+      prompt: What is your name?
+      private: no
+
+    - name: email
+      prompt: What is your email?
+      private: no
+
+  tasks:
+  - name: Install git deps
+    apt:
+      name: [vim, git, tig, xclip]
+      state: latest
+      update_cache: yes
+
+  - name: Config git user name
+    shell: 'git config --global user.name {{name}}'
+    become: yes
+    become_method: su
+    become_user: '{{username}}'
+
+  - name: Config git user email
+    shell: 'git config --global user.email {{email}}'
+    become: yes
+    become_method: su
+    become_user: '{{username}}'
+
+  - name: Config git editor
+    shell: git config --global core.editor vim
+    become: yes
+    become_method: su
+    become_user: '{{username}}'
+
+  - name: Verify ssh key
+    stat:
+      path: ~/.ssh/id_ed25519.pub
+    register: ssh_key
+    become: yes
+    become_method: su
+    become_user: '{{username}}'
+
+  - name: Generate new ssh key
+    shell: 'ssh-keygen -t ed25519 -C {{email}} -f ~/.ssh/id_ed25519'
+    when: not ssh_key.stat.exists
+    become: yes
+    become_method: su
+    become_user: '{{username}}'
+ 
+  - name: Start ssh agent and add key
+    shell: 'eval "$(ssh-agent -s)" && ssh-add ~/.ssh/id_ed25519'
+    become: yes
+    become_method: su
+    become_user: '{{username}}'
+
+  - name: Copy ssh key to clipboard
+    shell: xclip -selection clipboard < ~/.ssh/id_ed25519.pub
+    become: yes
+    become_method: su
+    become_user: '{{username}}'
+  
+  - name: Add key to Github
+    debug:
+      msg: 'Go to: https://github.com/settings/ssh/new'

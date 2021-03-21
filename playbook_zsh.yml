@@ -1,0 +1,33 @@
+---
+- name: Setup zsh
+  hosts: localhost
+  remote_user: root
+  vars_prompt:
+    - name: username
+      prompt: What is your username?
+      private: no
+  
+  tasks:
+  - name: Install zsh
+    apt:
+      name: zsh
+      state: latest
+      update_cache: yes
+  
+  - name: Remove Oh My ZSH
+    shell: rm -rf ~/.oh-my-zsh
+    become: yes
+    become_method: su
+    become_user: '{{username}}'
+
+  - name: Install Oh My ZSH
+    shell: sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+    become: yes
+    become_method: su
+    become_user: '{{username}}'
+  
+  - name: Enable plugins
+    shell: sed -i "s/\Aplugins=\(.*\)/plugins=(git asdf)/" ~/.zshrc
+    become: yes
+    become_method: su
+    become_user: '{{username}}'
