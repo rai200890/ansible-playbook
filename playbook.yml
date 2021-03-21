@@ -1,0 +1,66 @@
+---
+- name: Setup machine
+  remote_user: root
+  hosts: localhost
+  tasks:
+
+  - name: Install vim
+    apt:
+      name: vim
+      state: latest
+
+  - name: Install git
+    apt:
+      name: git
+      state: latest
+
+  - name: Install tig
+    apt:
+      name: tig
+      state: latest
+
+  - name: Install zsh
+    apt:
+      name: zsh
+      state: latest
+  
+  - name: Install docker deps
+    apt:
+      name: [apt-transport-https, ca-certificates, curl, gnupg, lsb-release]
+      state: latest
+
+  - name: Install chromium
+    snap:
+      name: chromium    
+
+  - name: Install VsCode
+    snap:
+      name: code
+
+  - name: Install dbeaver
+    snap:
+      name: dbeaver-ce
+
+  - name: Install Postman
+    snap:
+      name: postman
+
+  - name: Remove docker key
+    shell: rm -rf /usr/share/keyrings/docker-archive-keyring.gpg 
+
+  - name: Add docker key
+    shell: 'curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg'      
+  
+  - name: Add docker ppa
+    shell: 'echo \ deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu focal stable | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null'
+
+  - name: Install docker-ce
+    apt: 
+      name: [docker-ce, docker-ce-cli, containerd.io]
+      update_cache: yes
+
+  - name: Setup docker permission
+    shell: sudo usermod -aG docker $USER
+
+  - name: Install docker-compose
+    shell: 'curl -L "https://github.com/docker/compose/releases/download/1.28.5/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose && sudo chmod +x /usr/local/bin/docker-compose'
